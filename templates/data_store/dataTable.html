@@ -1,0 +1,36 @@
+{% extends 'base/base.html' %}
+{% block content %}
+
+<div class="container w-50 m-auto my-5">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Product id</th>
+                <th scope="col">Name</th>
+                <th scope="col">Data</th>
+                <th scope="col">User</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for product in  all_data%}
+                <tr>
+                    <th scope="row">{{product.id}}</th>
+                    <td>{{product.search_query}}</td>
+                    <td><a href="{% url 'show-individual' product.id %}" class="btn btn-outline-success"> Show Data</a></td>
+                    <td>{{product.user.first_name}}</td>
+                    <td>{{product.status}}</td>
+                    {% if product.status == 'Fetching' %}
+                        <script>alert("Data is being fetched")</script>
+                    {% endif %}
+                </tr>   
+            {% endfor %}
+        
+        </tbody>
+    </table>
+    <a class="btn btn-primary" href="{% url 'search' %}">Back</a>
+</div>
+
+{% endblock content%}
+

@@ -1,0 +1,45 @@
+{% extends 'base/base.html' %}
+{% block style %}
+    <style>
+        tr, td, th {
+            border: 1px solid black;
+        }
+    </style>
+{% endblock style %}
+{% block content %}
+<div class="container m-auto my-5 w-50">
+    <nav class="container mb-3">
+        <a class="btn btn-outline-dark" href="{% url 'search' %}">Search more</a>
+        <a class="btn btn-outline-dark ms-2" href="{% url 'show-data' %}">Back</a>
+    </nav>
+
+    <table class="table" border="2" >
+        
+            <tr>
+                <th class="text-center" scope="col" colspan="2">{{product_name}}</th>  
+            </tr>
+        
+        
+            
+            <tr >
+                
+                <th>Name</th>
+                <th>Pice</td>
+            </tr>
+            
+            {% for data in data_store %}
+                
+                <tr>
+                    
+                    <td>{{data.name}}</td>
+                    <td>{{data.price}}</td>
+                </tr>
+            {% endfor %}
+            
+     
+    </table>
+</div>
+
+
+
+{% endblock content %}

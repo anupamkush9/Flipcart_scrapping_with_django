@@ -1,0 +1,17 @@
+{% extends 'base/base.html' %}
+{% block content %}
+    <div class="container w-25 m-auto my-5">
+        <form method="post" action={% url 'search' %}>
+            {% csrf_token %}
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="search" name="search" required>
+                <label for="search">Search here....</label>
+            </div>
+            <div class='text-center'>
+                <button type="submit" class="btn btn-outline-dark text-center">Search</button>
+                <a href="{% url 'show-data' %}" class="btn btn-outline-dark ms-2">View Data</a>
+            </div>
+        </form>
+    </div>
+
+{% endblock content %}
