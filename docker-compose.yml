@@ -1,0 +1,82 @@
+version: "3"
+
+services:
+  # Redis cache
+  flipcart_cache:
+    image: redis:alpine
+    container_name: flipcart_cache
+    expose:
+      - 6379
+    networks:
+      - vpc1
+
+  # Database (Postgres)
+  flipkart_db:
+    image: postgres:12.4
+    container_name: flipkart_db
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5431:5432"
+    volumes:
+      - ../local_data1/postgres:/var/lib/postgresql/data
+    networks:
+      - vpc1
+
+
+# Django App
+  flipcart_web_app:
+    build: .
+    container_name: flipcart_web_app
+    command: python3.11 manage.py runserver 0.0.0.0:8000
+    # command: >
+    #   sh -c "
+    #         python3.8 manage.py makemigrations && 
+    #         python3.8 manage.py migrate &&
+    #         python3.8 manage.py runserver 0.0.0.0:8000           
+    #         "
+    volumes:
+      - .:/src
+    ports:
+      - "8000:8000"
+    depends_on:
+      - flipkart_db
+      - flipcart_cache
+    restart: always
+    networks:
+      - vpc1
+
+  # Worker
+  flipcart_celery_api:
+    build: .
+    container_name: flipcart_celery_api
+    command: celery -A web_scrapping.celery_app worker -l info -c 4
+    volumes:
+      - .:/src
+    depends_on:
+      - flipkart_db
+      - flipcart_cache
+      - flipcart_web_app
+    networks:
+      - vpc1
+
+  # Beat
+  flipcart_celery_beat:
+    build: .
+    container_name: flipcart_celery_beat
+    command: celery --pidfile= -A web_scrapping.celery beat -l info
+    volumes:
+      - .:/src
+    depends_on:
+      - flipkart_db
+      - flipcart_cache
+      - flipcart_web_app
+    networks:
+      - vpc1
+
+
+networks:
+  vpc1:
+    driver: bridge

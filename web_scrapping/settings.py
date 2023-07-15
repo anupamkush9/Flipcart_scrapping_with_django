@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-cpqi2_$_asvar)2ahm820a$hoqx7e2^52!jaxn!w&6tp0zhkb&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'authentication.User'
 # Application definition
@@ -83,8 +83,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        'PASSWORD' : 'password',
-        'HOST' : 'localhost',
+        'PASSWORD' : 'postgres',
+        'HOST' : 'flipkart_db',
         'PORT' : '5432'
     }
 }
@@ -132,8 +132,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'admin/'
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+CELERY_BROKER_URL = 'redis://flipcart_cache:6379'
+CELERY_RESULT_BACKEND = 'redis://flipcart_cache:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
