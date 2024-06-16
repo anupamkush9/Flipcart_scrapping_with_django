@@ -1,17 +1,141 @@
 {% extends 'base/base.html' %}
-{% block content %}
-    <div class="container w-25 m-auto my-5">
-        <form method="post" action={% url 'search' %}>
-            {% csrf_token %}
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" id="search" name="search" required>
-                <label for="search">Search here....</label>
-            </div>
-            <div class='text-center'>
-                <button type="submit" class="btn btn-outline-dark text-center">Search</button>
-                <a href="{% url 'show-data' %}" class="btn btn-outline-dark ms-2">View Data</a>
-            </div>
-        </form>
-    </div>
+{% load tz %}
+{% load static %}
 
-{% endblock content %}
+{% block title %}Search{% endblock %}
+{% block style %}
+<style>
+    #loader {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+        display: none;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .custom_error_messages {
+        margin-top: 10px;
+    }
+
+    .is-invalid {
+        border-color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="loader"></div>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h5 class="mb-4">Please enter credit_error and field_error for viewing errors</h5>
+            <form id="searchform" class="border p-4 bg-light rounded shadow-sm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label for="organization_name" class="form-label lblBusiness">Search</label>
+                        <input type="text" class="form-control" id="search_query" placeholder="Enter Search Query" name="search_query" required>
+                        <div id="permission_and_credit_message"></div>
+                    </div>
+                    <div class="form-group mb-3 text-center">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block" id="submitBtn">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('searchform').addEventListener('submit', function(e) {  
+        e.preventDefault();
+        
+        document.getElementById('loader').style.display = 'block';
+        document.getElementById('submitBtn').disabled = true;
+        document.getElementById('permission_and_credit_message').innerHTML = "";
+        
+        let invalidElements = document.querySelectorAll('.is-invalid');
+        invalidElements.forEach(el => el.classList.remove('is-invalid'));
+
+        let customErrorMessages = document.querySelectorAll('.custom_error_messages');
+        customErrorMessages.forEach(el => el.remove());
+        
+        var post_search_query_url = '/post_search_query/';
+        var myHeaders = new Headers();
+        myHeaders.append('X-CSRFToken', "{{ csrf_token }}");
+        var formdata = new FormData();
+
+        var fields = document.querySelectorAll('#searchform input');
+        for (var i = 0; i < fields.length; i++) {
+            var field = fields[i];
+            var fieldName = field.name;
+            var fieldValue = field.value;
+            if (fieldValue) {
+                formdata.append(fieldName, fieldValue);
+            }
+        }
+
+        fetch(post_search_query_url, {
+            method: 'POST',
+            headers: myHeaders,
+            body: formdata,
+            redirect: 'follow'
+        }).then(response => response.text())
+        .then(res => {
+                var result = JSON.parse(res)
+                if(typeof result !== "undefined"){
+                    if(typeof result.errors !== "undefined" && result.errors != null && result.errors.length > 0){
+                        document.getElementById('loader').style.display = 'none';
+                        if (typeof result.errors[0] == 'string') {
+                            document.getElementById('permission_and_credit_message').innerHTML = '<small class="custom_error_messages text-danger">'+result.errors[0]+'</small>';
+                        } else {
+                            result.errors.forEach(function(d) {
+                                if(d.code == "detail"){
+                                    document.getElementById('permission_and_credit_message').innerHTML = '<small class="custom_error_messages text-danger m-1" id="' + d.code + '_error">' + d.message + '</small>';
+                                } else {
+                                    var field = document.querySelector("[name='" + d.code + "']");
+                                    if (field !== undefined) {
+                                        field.classList.add("is-invalid");
+                                        var errorElement = document.createElement('small');
+                                        errorElement.className = 'custom_error_messages text-danger d-block';
+                                        errorElement.id = d.code + '_error';
+                                        errorElement.innerText = d.message;
+                                        field.insertAdjacentElement('afterend', errorElement);
+                                    }
+                                }
+                            });
+                        }
+                        document.getElementById('submitBtn').disabled = false;
+                    } else if(result.success){
+                        document.getElementById('loader').style.display = 'none';
+                        const taxexempt_form = document.getElementById('searchform');
+                        taxexempt_form.reset();
+                        document.location.reload();
+                    }
+                }
+            })
+        .catch(error => {
+            document.getElementById('loader').style.display = 'none';
+            console.log('error while calling post_search_query_url', error);
+            document.getElementById('commonError').innerHTML = "Something went wrong while processing your request. Please refresh the page and retry. <br> If the issue still persists, please contact Compliancely Support.";
+            return;
+        });
+    });
+});
+</script>
+{% endblock %}
