@@ -25,18 +25,14 @@ services:
     networks:
       - vpc1
 
-
-# Django App
+  # Django App
   flipcart_web_app:
     build: .
     container_name: flipcart_web_app
-    command: python3.11 manage.py runserver 0.0.0.0:8000
-    # command: >
-    #   sh -c "
-    #         python3.8 manage.py makemigrations && 
-    #         python3.8 manage.py migrate &&
-    #         python3.8 manage.py runserver 0.0.0.0:8000           
-    #         "
+    command: >
+      sh -c "
+            python3 manage.py runserver 0.0.0.0:8000           
+            "
     volumes:
       - .:/src
     ports:
@@ -66,7 +62,7 @@ services:
   flipcart_celery_beat:
     build: .
     container_name: flipcart_celery_beat
-    command: celery --pidfile= -A web_scrapping.celery beat -l info
+    command: celery -A web_scrapping.celery beat -l info --pidfile=
     volumes:
       - .:/src
     depends_on:
@@ -75,7 +71,6 @@ services:
       - flipcart_web_app
     networks:
       - vpc1
-
 
 networks:
   vpc1:
