@@ -9,6 +9,13 @@ services:
       - 6379
     networks:
       - vpc1
+    logging:
+      driver: awslogs
+      options:
+          awslogs-region: ap-south-1
+          awslogs-group: flipcart_scrapping_with_django_logs
+          awslogs-create-group: "true"
+          tag: "Dev/{{.Name}}_{{.ID}}"
 
   # Database (Postgres)
   flipkart_db:
@@ -24,6 +31,13 @@ services:
       - ../local_data1/postgres:/var/lib/postgresql/data
     networks:
       - vpc1
+    logging:
+      driver: awslogs
+      options:
+          awslogs-region: ap-south-1
+          awslogs-group: flipcart_scrapping_with_django_logs
+          awslogs-create-group: "true"
+          tag: "Dev/{{.Name}}_{{.ID}}"
 
 
 # Django App
@@ -47,6 +61,13 @@ services:
     restart: always
     networks:
       - vpc1
+    logging:
+      driver: awslogs
+      options:
+          awslogs-region: ap-south-1
+          awslogs-group: flipcart_scrapping_with_django_logs
+          awslogs-create-group: "true"
+          tag: "Dev/{{.Name}}_{{.ID}}"
 
   # Worker
   flipcart_celery_api:
@@ -61,6 +82,14 @@ services:
       - flipcart_web_app
     networks:
       - vpc1
+    logging:
+      driver: awslogs
+      options:
+          awslogs-region: ap-south-1
+          awslogs-group: flipcart_scrapping_with_django_logs
+          awslogs-create-group: "true"
+          tag: "Dev/{{.Name}}_{{.ID}}"
+
 
   # Beat
   flipcart_celery_beat:
@@ -75,8 +104,18 @@ services:
       - flipcart_web_app
     networks:
       - vpc1
+    logging:
+      driver: awslogs
+      options:
+          awslogs-region: ap-south-1
+          awslogs-group: flipcart_scrapping_with_django_logs
+          awslogs-create-group: "true"
+          tag: "Dev/{{.Name}}_{{.ID}}"
 
 
 networks:
   vpc1:
     driver: bridge
+
+# https://docs.docker.com/engine/logging/drivers/awslogs/#tag
+# reference for AWS CloudWatch Logs ( logging driver )

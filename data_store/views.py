@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views import View
 
-@login_required
+# @login_required
 def search_key(request):
     if request.method == 'POST':
         product_name = request.POST.get('search')
