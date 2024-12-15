@@ -15,7 +15,8 @@ services:
           awslogs-region: ap-south-1
           awslogs-group: flipcart_scrapping_with_django_logs
           awslogs-create-group: "true"
-          tag: "Dev/{{.Name}}_{{.ID}}"
+          awslogs-stream: "flipcart_cache-log-stream"
+          # tag: "Dev/{{.Name}}_{{.ID}}"
 
   # Database (Postgres)
   flipkart_db:
@@ -37,7 +38,8 @@ services:
           awslogs-region: ap-south-1
           awslogs-group: flipcart_scrapping_with_django_logs
           awslogs-create-group: "true"
-          tag: "Dev/{{.Name}}_{{.ID}}"
+          awslogs-stream: "flipkart_db-log-stream"
+          # tag: "Dev/{{.Name}}_{{.ID}}"
 
 
 # Django App
@@ -67,7 +69,8 @@ services:
           awslogs-region: ap-south-1
           awslogs-group: flipcart_scrapping_with_django_logs
           awslogs-create-group: "true"
-          tag: "Dev/{{.Name}}_{{.ID}}"
+          awslogs-stream: "flipcart_web_app-log-stream"
+          # tag: "Dev/{{.Name}}_{{.ID}}"
 
   # Worker
   flipcart_celery_api:
@@ -88,7 +91,8 @@ services:
           awslogs-region: ap-south-1
           awslogs-group: flipcart_scrapping_with_django_logs
           awslogs-create-group: "true"
-          tag: "Dev/{{.Name}}_{{.ID}}"
+          awslogs-stream: "flipcart_celery_api-log-stream"
+          # tag: "Dev/{{.Name}}_{{.ID}}"
 
 
   # Beat
@@ -110,7 +114,8 @@ services:
           awslogs-region: ap-south-1
           awslogs-group: flipcart_scrapping_with_django_logs
           awslogs-create-group: "true"
-          tag: "Dev/{{.Name}}_{{.ID}}"
+          awslogs-stream: "flipcart_celery_beat-log-stream"
+          # tag: "Dev/{{.Name}}_{{.ID}}"
 
 
 networks:
